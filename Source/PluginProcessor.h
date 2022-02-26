@@ -58,6 +58,21 @@ public:
     juce::AudioProcessorValueTreeState apvts = juce::AudioProcessorValueTreeState(*this, nullptr, "Parameters", createParameterLayout());
 
 private:
+
+    // Type aliasing - Only Float filters for this project
+    using Filter = juce::dsp::IIR::Filter<float>;
+
+    /* Each Filter processes 12 dB/Oct. Since the LowCut Slope/ HighCut Slope can go upto 48 dB/Oct,
+       we need 4 of these filters in a ProcessorChain*/
+    using CutFilter = juce::dsp::ProcessorChain<Filter, Filter, Filter, Filter>;
+
+    /* Create a ProcessorChain with required Filters. Here,
+       LowCut -> Parameteric -> HighCut */
+    using MonoChain = juce::dsp::ProcessorChain<CutFilter, Filter, CutFilter>;
+
+    // Two MonoChain objects required for the Stereo Processing
+    MonoChain leftChain, rightChain;
+
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SimpleEQAudioProcessor)
 };

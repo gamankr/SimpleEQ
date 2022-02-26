@@ -95,6 +95,21 @@ void SimpleEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
+
+    /*
+    Prepare the Filter ProcessorChain instances - By passing a ProcessSpec to each chain,
+    which then passes the ProcessSpec to each link in the chain
+    */
+    juce::dsp::ProcessSpec spec;
+    spec.maximumBlockSize = samplesPerBlock;
+
+    // MonoChain can only handle 1 channel of audio
+    spec.numChannels = 1;
+    spec.sampleRate = sampleRate;
+
+    leftChain.prepare(spec);
+    rightChain.prepare(spec);
+
 }
 
 void SimpleEQAudioProcessor::releaseResources()
@@ -150,12 +165,31 @@ void SimpleEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     // the samples and the outer loop is handling the channels.
     // Alternatively, you can process the samples with the channels
     // interleaved by keeping the same state.
+    /*
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
         auto* channelData = buffer.getWritePointer (channel);
 
         // ..do something to the data...
     }
+    */
+
+    juce::dsp::AudioBlock<float> block(buffer);
+
+    // Block represent individual channel
+    auto leftBlock = block.getSingleChannelBlock(0);
+    auto rightBlock = block.getSingleChannelBlock(1);
+
+    // ProcessingContext provides wrapper around AudioBlock that the ProcessorChain can use
+    juce::dsp::ProcessContextReplacing<float> leftContext(leftBlock);
+    juce::dsp::ProcessContextReplacing<float> rightContext(rightBlock);
+
+    /* ProcessorChain reqquires ProcessingContext to be passed through it in order to run the
+       Audio through the links in the chain*/
+    leftChain.process(leftContext);
+    rightChain.process(rightContext);
+
+
 }
 
 //==============================================================================
