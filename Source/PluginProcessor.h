@@ -10,11 +10,19 @@
 
 #include <JuceHeader.h>
 
+enum Slope
+{
+    Slope_12,
+    Slope_24,
+    Slope_36,
+    Slope_48
+};
+
 struct ChainSettings
 {
     float peakFreq{0}, peakGainInDecibels{0}, peakQuality{1.f};
     float lowCutFreq{0}, highCutFreq{0};
-    int lowCutSlope{0}, highCutSlope{0};
+    Slope lowCutSlope{Slope::Slope_12}, highCutSlope{Slope::Slope_12};
 };
 
 ChainSettings getChainSettings(juce::AudioProcessorValueTreeState& apvts); 
@@ -71,8 +79,9 @@ private:
     // Type aliasing - Only Float filters for this project
     using Filter = juce::dsp::IIR::Filter<float>;
 
-    /* Each Filter processes 12 dB/Oct. Since the LowCut Slope/ HighCut Slope can go upto 48 dB/Oct,
-       we need 4 of these filters in a ProcessorChain*/
+    /* Each Filter processes 12 dB/Oct if configured as LowCut ( also called HighPass) /
+     HighCut (LowPass) Filter. Since the LowCut Slope/ HighCut Slope can go upto 48 dB/Oct,
+     we need 4 of these filters in a ProcessorChain*/
     using CutFilter = juce::dsp::ProcessorChain<Filter, Filter, Filter, Filter>;
 
     /* Create a ProcessorChain with required Filters. Here,
