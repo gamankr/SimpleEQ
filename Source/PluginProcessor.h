@@ -104,20 +104,28 @@ private:
     using Coefficients = Filter::CoefficientsPtr;
     static void updateCoefficients(Coefficients& old, const Coefficients& replacements);
     
+    template<int Index, typename ChainType, typename CoefficientType>
+    void updateChain(ChainType& chain,
+                const CoefficientType& coefficients)
+    {
+        updateCoefficients(chain.template get<Index>().coefficients, coefficients[Index]);
+        chain.template setBypassed<Index>(false);
+    }
+    
     template<typename ChainType, typename CoefficientType>
-    void updateCutFilter(ChainType& selectedLowCutFilter,
+    void updateCutFilter(ChainType& chain,
                         const CoefficientType& cutCoefficients,
-                        const Slope& lowCutSlope)
+                        const Slope& slope)
     {
         
         
         // Bypass links in the chain
-        selectedLowCutFilter.template setBypassed<0>(true);
-        selectedLowCutFilter.template setBypassed<1>(true);
-        selectedLowCutFilter.template setBypassed<2>(true);
-        selectedLowCutFilter.template setBypassed<3>(true);
+        chain.template setBypassed<0>(true);
+        chain.template setBypassed<1>(true);
+        chain.template setBypassed<2>(true);
+        chain.template setBypassed<3>(true);
         
-        switch(lowCutSlope)
+        switch(slope)
         {
                 /*
                  switch statement code refactored to below code using switch case pass-through trick.
@@ -128,24 +136,19 @@ private:
                     
                 case Slope_48:
                 {
-                    *selectedLowCutFilter.template get<3>().coefficients = *cutCoefficients[3];
-                    selectedLowCutFilter.template setBypassed<3>(false);
+                    updateChain<3>(chain, cutCoefficients);
                 }
                 case Slope_36:
                 {
-                    *selectedLowCutFilter.template get<2>().coefficients = *cutCoefficients[2];
-                    selectedLowCutFilter.template setBypassed<2>(false);
-
+                    updateChain<2>(chain, cutCoefficients);
                 }
                 case Slope_24:
                 {
-                    *selectedLowCutFilter.template get<1>().coefficients = *cutCoefficients[1];
-                    selectedLowCutFilter.template setBypassed<1>(false);
+                    updateChain<1>(chain, cutCoefficients);
                 }
                 case Slope_12:
                 {
-                    *selectedLowCutFilter.template get<0>().coefficients = *cutCoefficients[0];
-                    selectedLowCutFilter.template setBypassed<0>(false);
+                    updateChain<0>(chain, cutCoefficients);
                 }
         }
         
