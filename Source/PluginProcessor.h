@@ -119,42 +119,34 @@ private:
         
         switch(lowCutSlope)
         {
-            case Slope_12:
-            {
-                *selectedLowCutFilter.template get<0>().coefficients = *cutCoefficients[0];
-                selectedLowCutFilter.template setBypassed<0>(false);
-                break;
-            }
-            case Slope_24:
-            {
-                *selectedLowCutFilter.template get<0>().coefficients = *cutCoefficients[0];
-                selectedLowCutFilter.template setBypassed<0>(false);
-                *selectedLowCutFilter.template get<1>().coefficients = *cutCoefficients[1];
-                selectedLowCutFilter.template setBypassed<1>(false);
-                break;
-            }
-            case Slope_36:
-            {
-                *selectedLowCutFilter.template get<0>().coefficients = *cutCoefficients[0];
-                selectedLowCutFilter.template setBypassed<0>(false);
-                *selectedLowCutFilter.template get<1>().coefficients = *cutCoefficients[1];
-                selectedLowCutFilter.template setBypassed<1>(false);
-                *selectedLowCutFilter.template get<2>().coefficients = *cutCoefficients[2];
-                selectedLowCutFilter.template setBypassed<2>(false);
-                break;
-            }
-            case Slope_48:
-            {
-                *selectedLowCutFilter.template get<0>().coefficients = *cutCoefficients[0];
-                selectedLowCutFilter.template setBypassed<0>(false);
-                *selectedLowCutFilter.template get<1>().coefficients = *cutCoefficients[1];
-                selectedLowCutFilter.template setBypassed<1>(false);
-                *selectedLowCutFilter.template get<2>().coefficients = *cutCoefficients[2];
-                selectedLowCutFilter.template setBypassed<2>(false);
-                *selectedLowCutFilter.template get<3>().coefficients = *cutCoefficients[3];
-                selectedLowCutFilter.template setBypassed<3>(false);
-                break;
-            }
+                /*
+                 switch statement code refactored to below code using switch case pass-through trick.
+                 Check link: https://stackoverflow.com/questions/8146106/does-case-switch-work-like-this
+                 Remove "break" statement for pass-through.
+                 Check commit for previous code: "Refactoring using switch case pass-through trick"
+                 */
+                    
+                case Slope_48:
+                {
+                    *selectedLowCutFilter.template get<3>().coefficients = *cutCoefficients[3];
+                    selectedLowCutFilter.template setBypassed<3>(false);
+                }
+                case Slope_36:
+                {
+                    *selectedLowCutFilter.template get<2>().coefficients = *cutCoefficients[2];
+                    selectedLowCutFilter.template setBypassed<2>(false);
+
+                }
+                case Slope_24:
+                {
+                    *selectedLowCutFilter.template get<1>().coefficients = *cutCoefficients[1];
+                    selectedLowCutFilter.template setBypassed<1>(false);
+                }
+                case Slope_12:
+                {
+                    *selectedLowCutFilter.template get<0>().coefficients = *cutCoefficients[0];
+                    selectedLowCutFilter.template setBypassed<0>(false);
+                }
         }
         
     }
